@@ -140,7 +140,7 @@ const modeTourSteps = [
   { mode: "Linguistic", icon: BookOpen, title: "Follow the engineering argument", instruction: "Each decision compares the chosen design with a rejected baseline, then explains failure modes, evidence context, and production takeaways." },
 ];
 
-function ModeTour() {
+function ModeTour({ prominent = false }: { prominent?: boolean }) {
   const [open, setOpen] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const current = modeTourSteps[stepIndex];
@@ -162,7 +162,7 @@ function ModeTour() {
   }
 
   return <>
-    <button type="button" onClick={() => setOpen(true)} aria-haspopup="dialog" className="inline-flex items-center gap-2 rounded-lg border border-indigo-300/20 bg-indigo-300/[0.06] px-3 py-2 text-[11px] font-semibold text-indigo-100 transition hover:bg-indigo-300/[0.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"><Eye aria-hidden="true" className="h-3.5 w-3.5" />Tour the 5 modes</button>
+    <button type="button" onClick={() => setOpen(true)} aria-haspopup="dialog" className={prominent ? "inline-flex items-center gap-2 rounded-lg border border-indigo-300/30 bg-indigo-300/[0.12] px-4 py-2.5 text-xs font-semibold text-indigo-100 shadow-lg shadow-indigo-950/20 transition hover:bg-indigo-300/[0.18] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300" : "inline-flex items-center gap-2 rounded-lg border border-indigo-300/20 bg-indigo-300/[0.06] px-3 py-2 text-[11px] font-semibold text-indigo-100 transition hover:bg-indigo-300/[0.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"}><Eye aria-hidden="true" className="h-3.5 w-3.5" />{prominent ? "Take the 5-mode tour" : "5-mode tour"}</button>
     {open && <div role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false); }} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
       <div role="dialog" aria-modal="true" aria-labelledby="mode-tour-title" aria-describedby="mode-tour-description" className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#111115] p-5 shadow-2xl shadow-black/60 sm:p-7">
         <div className="mb-6 flex items-start justify-between gap-4"><div><div className="text-[10px] font-bold uppercase tracking-[0.16em] text-indigo-300">Interactive onboarding · {stepIndex + 1} of {modeTourSteps.length}</div><div className="mt-3 flex gap-1.5" aria-label={`Step ${stepIndex + 1} of ${modeTourSteps.length}`}>{modeTourSteps.map((step, index) => <span key={step.mode} className={`h-1 flex-1 rounded-full ${index <= stepIndex ? "bg-indigo-300" : "bg-white/10"}`} />)}</div></div><button type="button" onClick={() => setOpen(false)} aria-label="Close tour" className="rounded-md px-2 py-1 text-xs text-zinc-500 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300">Esc · Close</button></div>
@@ -190,8 +190,8 @@ function App() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_48%_-25%,rgba(99,102,241,0.16),transparent_58%)]" />
         <nav aria-label="Main navigation" className="relative mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8">
           <a href="#top" className="flex items-center gap-2.5 text-sm font-semibold tracking-tight text-zinc-100">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] font-mono text-[10px] text-indigo-200">S/02</span>
-            Systems work
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] font-mono text-[10px] text-indigo-200">MP</span>
+            My Projects
           </a>
           <div className="flex items-center gap-5 text-xs text-zinc-500">
             <a className="transition hover:text-zinc-200" href="#projects">Project analysis</a>
@@ -204,7 +204,7 @@ function App() {
           <div>
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-indigo-300/15 bg-indigo-300/[0.05] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-indigo-200">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.7)]" />
-              Systems portfolio · engineering decisions
+              My projects · interactive systems
             </div>
             <h1 className="max-w-3xl text-4xl font-semibold leading-[1.08] tracking-[-0.045em] text-white sm:text-5xl lg:text-6xl">
               The architecture is in the <span className="bg-gradient-to-r from-indigo-200 via-sky-200 to-emerald-200 bg-clip-text text-transparent">trade-offs.</span>
@@ -213,10 +213,10 @@ function App() {
               Two systems, six consequential choices. Explore how browser workflows become deterministic code—and how a learned scheduler handles changing clusters without losing its constraints.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <a href="#projects" className="inline-flex items-center gap-2 rounded-lg bg-zinc-100 px-4 py-2.5 text-xs font-semibold text-zinc-950 transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300">
-                Explore the decisions <ArrowDown aria-hidden="true" className="h-3.5 w-3.5" />
+              <ModeTour prominent />
+              <a href="#projects" className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2.5 text-xs font-semibold text-zinc-200 transition hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300">
+                Explore projects <ArrowDown aria-hidden="true" className="h-3.5 w-3.5" />
               </a>
-              <span className="text-[11px] text-zinc-600">Interactive technical case studies</span>
             </div>
           </div>
 
@@ -247,7 +247,7 @@ function App() {
 
       <footer className="border-t border-white/[0.07] px-5 py-6 sm:px-8">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 text-[10px] text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
-          <span>Systems work <span className="text-zinc-700">/</span> Architectural decisions</span>
+          <span>My Projects <span className="text-zinc-700">/</span> Interactive systems</span>
           <span>Built as an interactive portfolio artifact</span>
         </div>
       </footer>

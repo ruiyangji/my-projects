@@ -1,6 +1,8 @@
-# Systems Portfolio
+# My Projects
 
 An interactive portfolio piece comparing architectural choices in browser automation and reinforcement-learning-based cluster scheduling.
+
+The homepage includes a five-mode walkthrough. Select **Take the 5-mode tour** in the hero to see where the visual, aural, gestural, spatial, and linguistic interactions are located.
 
 ## Run locally
 
