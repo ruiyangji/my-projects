@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowDown, ArrowUpRight, AudioLines, Braces, CircuitBoard, MousePointer2, Pause, Play, Square, Workflow } from "lucide-react";
+import { ArrowDown, ArrowUpRight, AudioLines, BookOpen, Braces, CircuitBoard, Eye, Hand, LayoutGrid, MousePointer2, Pause, Play, Square, Workflow } from "lucide-react";
 import ArchitecturalDecisions from "../ArchitecturalDecisions";
 
 const mapStages = [
@@ -132,6 +132,50 @@ function AudioGuide() {
   );
 }
 
+const modeTourSteps = [
+  { mode: "Visual", icon: Eye, title: "Read the systems as pictures", instruction: "Follow the animated Trace2Code pipeline, inspect the capacity bars, then drag the 3D cluster to orbit its machines." },
+  { mode: "Aural", icon: AudioLines, title: "Listen to the overview", instruction: "Use Play audio in the hero. Your browser speaks the project introduction; the written version remains on the page." },
+  { mode: "Gestural", icon: Hand, title: "Move a workload with your hand", instruction: "In the scheduler lab, drag Batch worker onto Node A. With action masking on, the over-capacity placement is blocked. Switch to Reward penalty and try again." },
+  { mode: "Spatial", icon: LayoutGrid, title: "Navigate and reshape the view", instruction: "Switch project tabs, resize the cluster, reorder its machines, orbit the scene, and expand a decision drawer to control how much detail you see." },
+  { mode: "Linguistic", icon: BookOpen, title: "Follow the engineering argument", instruction: "Each decision compares the chosen design with a rejected baseline, then explains failure modes, evidence context, and production takeaways." },
+];
+
+function ModeTour() {
+  const [open, setOpen] = useState(false);
+  const [stepIndex, setStepIndex] = useState(0);
+  const current = modeTourSteps[stepIndex];
+  const Icon = current.icon;
+
+  useEffect(() => {
+    if (!open) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [open]);
+
+  function finishTour() {
+    setOpen(false);
+    setStepIndex(0);
+    document.getElementById("projects")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  return <>
+    <button type="button" onClick={() => setOpen(true)} aria-haspopup="dialog" className="inline-flex items-center gap-2 rounded-lg border border-indigo-300/20 bg-indigo-300/[0.06] px-3 py-2 text-[11px] font-semibold text-indigo-100 transition hover:bg-indigo-300/[0.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"><Eye aria-hidden="true" className="h-3.5 w-3.5" />Tour the 5 modes</button>
+    {open && <div role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false); }} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
+      <div role="dialog" aria-modal="true" aria-labelledby="mode-tour-title" aria-describedby="mode-tour-description" className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#111115] p-5 shadow-2xl shadow-black/60 sm:p-7">
+        <div className="mb-6 flex items-start justify-between gap-4"><div><div className="text-[10px] font-bold uppercase tracking-[0.16em] text-indigo-300">Interactive onboarding · {stepIndex + 1} of {modeTourSteps.length}</div><div className="mt-3 flex gap-1.5" aria-label={`Step ${stepIndex + 1} of ${modeTourSteps.length}`}>{modeTourSteps.map((step, index) => <span key={step.mode} className={`h-1 flex-1 rounded-full ${index <= stepIndex ? "bg-indigo-300" : "bg-white/10"}`} />)}</div></div><button type="button" onClick={() => setOpen(false)} aria-label="Close tour" className="rounded-md px-2 py-1 text-xs text-zinc-500 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300">Esc · Close</button></div>
+        <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-indigo-300/20 bg-indigo-300/[0.08] text-indigo-200"><Icon aria-hidden="true" className="h-5 w-5" /></div>
+        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-500">{current.mode} mode</p>
+        <h2 id="mode-tour-title" className="mt-2 text-2xl font-semibold tracking-tight text-white">{current.title}</h2>
+        <p id="mode-tour-description" className="mt-3 min-h-[76px] text-sm leading-relaxed text-zinc-400">{current.instruction}</p>
+        <div className="mt-7 flex items-center justify-between border-t border-white/[0.07] pt-4"><button type="button" onClick={() => setStepIndex((index) => Math.max(0, index - 1))} disabled={stepIndex === 0} className="rounded-lg px-3 py-2 text-xs font-medium text-zinc-400 hover:text-white disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300">Back</button><button type="button" onClick={() => stepIndex === modeTourSteps.length - 1 ? finishTour() : setStepIndex((index) => index + 1)} className="rounded-lg bg-zinc-100 px-4 py-2.5 text-xs font-semibold text-zinc-950 transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300">{stepIndex === modeTourSteps.length - 1 ? "Start exploring" : "Next mode"}</button></div>
+      </div>
+    </div>}
+  </>;
+}
+
 function App() {
   return (
     <div className="min-h-screen overflow-hidden bg-[#09090b] text-zinc-100">
@@ -152,6 +196,7 @@ function App() {
           <div className="flex items-center gap-5 text-xs text-zinc-500">
             <a className="transition hover:text-zinc-200" href="#projects">Project analysis</a>
             <a className="inline-flex items-center gap-1.5 transition hover:text-zinc-200" href="#approach">Approach <ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" /></a>
+            <ModeTour />
           </div>
         </nav>
 
