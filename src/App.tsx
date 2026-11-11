@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { ArrowDown, ArrowUpRight, AudioLines, BookOpen, Braces, CircuitBoard, Eye, Hand, LayoutGrid, MousePointer2, Pause, Play, Square, Workflow, type LucideIcon } from "lucide-react";
 import ArchitecturalDecisions from "../ArchitecturalDecisions";
+import ConstraintStory from "./components/ConstraintStory";
 
 const mapStages = [
   {
@@ -135,7 +136,7 @@ function AudioGuide() {
 interface ModeTourStep { mode: string; icon: LucideIcon; title: string; target: string; instruction: string; project?: "scheduler" }
 
 const modeTourSteps: ModeTourStep[] = [
-  { mode: "Visual", icon: Eye, title: "Start with the system map", target: "system-map", instruction: "The glowing map turns each system into a visual model. Hover, focus, or click Observe, Represent, and Execute to inspect the stages." },
+  { mode: "Visual", icon: Eye, title: "Start with the system map", target: "system-map", instruction: "This map is one visual piece: hover, focus, or click Observe, Represent, and Execute. The second is How I build below the projects, an original decision story with visual, spatial, gestural, and written modes." },
   { mode: "Aural", icon: AudioLines, title: "Listen to the overview", target: "audio-guide", instruction: "Press Play audio to hear the project overview spoken by your browser. Pause and Stop are available while it speaks." },
   { mode: "Gestural", icon: Hand, title: "Select a workload", target: "batch-task", project: "scheduler", instruction: "Click Batch worker to select it, or start dragging it toward Node A. The next stop points to the destination." },
   { mode: "Gestural", icon: Hand, title: "Test the hard action mask", target: "node-a", project: "scheduler", instruction: "With Action mask selected, click Node A or drop Batch worker there. It exceeds CPU capacity, so the placement should be blocked." },
@@ -147,7 +148,7 @@ const modeTourSteps: ModeTourStep[] = [
 
 interface TourSpotlight { top: number; left: number; width: number; height: number; cursorX: number; cursorY: number }
 
-function ModeTour({ prominent = false }: { prominent?: boolean }) {
+function ModeTour({ prominent = false, autoOpen = true }: { prominent?: boolean; autoOpen?: boolean }) {
   const [open, setOpen] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [spotlight, setSpotlight] = useState<TourSpotlight | null>(null);
@@ -155,13 +156,13 @@ function ModeTour({ prominent = false }: { prominent?: boolean }) {
   const Icon = current.icon;
 
   useEffect(() => {
-    if (!prominent) return;
+    if (!prominent || !autoOpen) return;
     try {
       if (!window.localStorage.getItem("my-projects-multimodal-tour-seen")) setOpen(true);
     } catch {
       setOpen(true);
     }
-  }, [prominent]);
+  }, [autoOpen, prominent]);
 
   useEffect(() => {
     if (!open) return;
@@ -245,6 +246,13 @@ function ModeTour({ prominent = false }: { prominent?: boolean }) {
 }
 
 function App() {
+  useLayoutEffect(() => {
+    const targetId = window.location.hash.slice(1) || "how-i-build";
+    if (!window.location.hash) window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}#${targetId}`);
+    const frame = window.requestAnimationFrame(() => document.getElementById(targetId)?.scrollIntoView({ block: "start" }));
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
   return (
     <div className="min-h-screen overflow-hidden bg-[#09090b] text-zinc-100">
       <a
@@ -261,8 +269,9 @@ function App() {
             <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] font-mono text-[10px] text-indigo-200">MP</span>
             My Projects
           </a>
-          <div className="flex items-center gap-5 text-xs text-zinc-500">
-            <a className="transition hover:text-zinc-200" href="#projects">Project analysis</a>
+          <div className="flex items-center gap-2.5 text-[10px] text-zinc-500 sm:gap-5 sm:text-xs">
+            <a className="transition hover:text-zinc-200" href="#projects">Projects</a>
+            <a className="transition hover:text-zinc-200" href="#how-i-build">How I build</a>
             <a className="inline-flex items-center gap-1.5 transition hover:text-zinc-200" href="#approach">Approach <ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" /></a>
           </div>
         </nav>
@@ -280,7 +289,7 @@ function App() {
               Two systems, six consequential choices. Explore how browser workflows become deterministic code—and how a learned scheduler handles changing clusters without losing its constraints.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <ModeTour prominent />
+              <ModeTour prominent autoOpen={false} />
               <a href="#projects" className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2.5 text-xs font-semibold text-zinc-200 transition hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300">
                 Explore projects <ArrowDown aria-hidden="true" className="h-3.5 w-3.5" />
               </a>
@@ -296,6 +305,8 @@ function App() {
         <div id="projects" className="scroll-mt-6">
           <ArchitecturalDecisions />
         </div>
+
+        <ConstraintStory />
 
         <section id="approach" aria-labelledby="approach-heading" className="border-t border-white/[0.07] bg-[#0c0c0f] px-5 py-16 sm:px-8 sm:py-20">
           <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.65fr_1fr] lg:gap-20">
