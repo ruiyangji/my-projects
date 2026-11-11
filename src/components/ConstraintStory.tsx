@@ -161,9 +161,7 @@ function CasePanel({ study, panelId }: { study: CaseStudy; panelId: string }) {
 
 function ConstraintStory(): JSX.Element {
   const [selectedCase, setSelectedCase] = useState<CaseId>("browser");
-  const [showGraderGuide, setShowGraderGuide] = useState(false);
   const graderDialogRef = useRef<HTMLDialogElement>(null);
-  const graderGuideHeadingRef = useRef<HTMLHeadingElement>(null);
   const currentStudy = caseStudies[selectedCase];
   const panelId = `${selectedCase}-panel`;
 
@@ -174,39 +172,21 @@ function ConstraintStory(): JSX.Element {
     return () => { if (dialog.open) dialog.close(); };
   }, []);
 
-  useEffect(() => {
-    if (showGraderGuide) graderGuideHeadingRef.current?.focus();
-  }, [showGraderGuide]);
-
   function closeGraderDialog() {
     graderDialogRef.current?.close();
-    setShowGraderGuide(false);
   }
 
   return <Theme theme={neutralTheme} mode="dark">
     <section id="how-i-build" aria-labelledby="how-i-build-heading" className="scroll-mt-8 border-t border-white/[0.07] bg-[#0a0a0d] px-5 py-16 sm:px-8 sm:py-20">
-      <dialog ref={graderDialogRef} aria-labelledby={showGraderGuide ? "grader-guide-heading" : "grader-dialog-heading"} aria-describedby="grader-dialog-description" className="m-auto max-h-[min(90vh,42rem)] w-[min(92vw,38rem)] rounded-2xl border border-white/10 bg-[#111114] p-0 text-zinc-100 shadow-2xl shadow-black/50 backdrop:bg-black/75 backdrop:backdrop-blur-sm">
+      <dialog ref={graderDialogRef} aria-labelledby="grader-dialog-heading" aria-describedby="grader-dialog-description" className="m-auto max-h-[min(90vh,42rem)] w-[min(92vw,38rem)] rounded-2xl border border-white/10 bg-[#111114] p-0 text-zinc-100 shadow-2xl shadow-black/50 backdrop:bg-black/75 backdrop:backdrop-blur-sm">
         <div className="p-5 sm:p-7">
           <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-300">Portfolio content check</p>
-          {showGraderGuide ? <>
-            <h2 ref={graderGuideHeadingRef} id="grader-guide-heading" tabIndex={-1} className="text-xl font-semibold tracking-tight text-white">Here’s what to explore</h2>
-            <p id="grader-dialog-description" className="mt-2 text-sm leading-relaxed text-zinc-400">This is my second multimodal piece. It uses four modes:</p>
-            <ul className="mt-4 grid gap-2 text-xs text-zinc-300 sm:grid-cols-2">
-              <li className="rounded-lg border border-white/[0.07] bg-white/[0.025] p-3"><span className="font-semibold text-emerald-200">Visual</span><span className="mt-1 block text-zinc-400">Original decision path diagram</span></li>
-              <li className="rounded-lg border border-white/[0.07] bg-white/[0.025] p-3"><span className="font-semibold text-emerald-200">Spatial</span><span className="mt-1 block text-zinc-400">Move through five decision stages</span></li>
-              <li className="rounded-lg border border-white/[0.07] bg-white/[0.025] p-3"><span className="font-semibold text-emerald-200">Gestural</span><span className="mt-1 block text-zinc-400">Select a case, choose a stage, reveal tradeoffs</span></li>
-              <li className="rounded-lg border border-white/[0.07] bg-white/[0.025] p-3"><span className="font-semibold text-emerald-200">Linguistic</span><span className="mt-1 block text-zinc-400">First-person explanation and project evidence</span></li>
-            </ul>
-            <p className="mt-4 text-xs leading-relaxed text-zinc-400">Choose Trace2Code or Scheduler, select stages in the decision path, then open “Show the tradeoff.”</p>
-            <div className="mt-5 flex justify-end"><Button label="Start exploring" variant="primary" onClick={closeGraderDialog} /></div>
-          </> : <>
-            <h2 id="grader-dialog-heading" className="text-xl font-semibold tracking-tight text-white">Are you the grader?</h2>
-            <p id="grader-dialog-description" className="mt-2 text-sm leading-relaxed text-zinc-400">This page opens at the second multimodal piece, “How I build.” I can point out its modes and interactions before you explore.</p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              <Button label="Yes, I’m grading" variant="primary" onClick={() => setShowGraderGuide(true)} />
-              <Button label="No, just exploring" variant="secondary" onClick={closeGraderDialog} />
-            </div>
-          </>}
+          <h2 id="grader-dialog-heading" className="text-xl font-semibold tracking-tight text-white">Are you the grader?</h2>
+          <p id="grader-dialog-description" className="mt-2 text-sm leading-relaxed text-zinc-400">We’ll take you straight to the multimodal piece.</p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Button label="Take me there" variant="primary" onClick={closeGraderDialog} />
+            <Button label="No, just exploring" variant="secondary" onClick={closeGraderDialog} />
+          </div>
         </div>
       </dialog>
       <div className="mx-auto max-w-7xl">
